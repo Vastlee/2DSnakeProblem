@@ -10,19 +10,36 @@ public class UIController : MonoSingleton<UIController> {
 
     #region Delegates & Events
     public delegate void UIClickHandler();
-    public UIClickHandler OnClickGenerate;
+    public event UIClickHandler OnClickGenerate;
+    public event UIClickHandler OnClickSnake;
 
     public delegate void UIGridSizeChangeHandler(int newSize);
-    public UIGridSizeChangeHandler OnGridWidthChange;
-    public UIGridSizeChangeHandler OnGridHeightChange;
+    public event UIGridSizeChangeHandler OnGridWidthChange;
+    public event UIGridSizeChangeHandler OnGridHeightChange;
     #endregion
 
     #region Unity
+    private void Start() {
+        CheckForInput();
+    }
     #endregion
 
     #region Methods
-    public void BroadcastClick_Generate() {
+    private void CheckForInput() {
+        if(!string.IsNullOrEmpty(widthInput.text)) {
+            BroadcastWidthChange();
+        }
+        if(!string.IsNullOrEmpty(heightInput.text)) {
+            BroadcastHeightChange();
+        }
+    }
+
+    public void BroadcastClickGenerate() {
         this.OnClickGenerate?.Invoke();
+    }
+
+    public void BroadcastClickSnake() {
+        this.OnClickSnake?.Invoke();
     }
 
     public void BroadcastWidthChange() {
