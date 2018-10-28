@@ -2,9 +2,6 @@
 using UnityEngine.UI;
 
 public class UIController : MonoSingleton<UIController> {
-    [SerializeField] private InputField widthInput;
-    [SerializeField] private InputField heightInput;
-
     #region Properties
     #endregion
 
@@ -19,40 +16,28 @@ public class UIController : MonoSingleton<UIController> {
     #endregion
 
     #region Unity
-    private void Start() {
-        CheckForInput();
-    }
     #endregion
 
     #region Methods
-    private void CheckForInput() {
-        if(!string.IsNullOrEmpty(widthInput.text)) {
-            BroadcastWidthChange();
-        }
-        if(!string.IsNullOrEmpty(heightInput.text)) {
-            BroadcastHeightChange();
-        }
-    }
-
     public void BroadcastClickGenerate() {
-        this.OnClickGenerate?.Invoke();
+        OnClickGenerate?.Invoke();
     }
 
     public void BroadcastClickSnake() {
-        this.OnClickSnake?.Invoke();
+        OnClickSnake?.Invoke();
     }
 
-    public void BroadcastWidthChange() {
-        int newWidth;
-        if(int.TryParse(widthInput.text, out newWidth)) {
-            OnGridWidthChange?.Invoke(newWidth);
+    public void BroadcastWidthChange(string newWidth) {
+        int width;
+        if(System.Int32.TryParse(newWidth, out width)) {
+            OnGridWidthChange?.Invoke(width);
         }
     }
 
-    public void BroadcastHeightChange() {
-        int newHeight;
-        if(int.TryParse(heightInput.text, out newHeight)) {
-            OnGridHeightChange?.Invoke(newHeight);
+    public void BroadcastHeightChange(string newHeight) {
+        int height;
+        if(System.Int32.TryParse(newHeight, out height)) {
+            OnGridHeightChange?.Invoke(height);
         }
     }
     #endregion

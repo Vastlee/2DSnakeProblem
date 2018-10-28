@@ -25,51 +25,60 @@ public class GridManager : MonoBehaviour {
 
     #region Methods
     private void StartSnakeGrid() {
-        StartCoroutine(SnakeGrid());
+        StartCoroutine(SnakeGrid(this.grid2DArray));
     }
 
-    private IEnumerator SnakeGrid() {
+    private IEnumerator SnakeGrid(GridArrayData[,] data) {
         int row, rowMin, rowMax, col, colMin, colMax;
         rowMin = colMin = 0;
-        colMax = this.grid2DArray.GetLength(0);
-        rowMax = this.grid2DArray.GetLength(1);
+        colMax = data.GetLength(0);
+        rowMax = data.GetLength(1);
+        bool isComplete = false;
+        WaitForSeconds pauseTime = new WaitForSeconds(0.0f);
 
-        int test = 0;
-        while(test++ < 3/*rowMin <= rowMax && colMin <= colMax*/) {
-            Debug.Log("Pass #" + test
-                + " | cMin: " + colMin
-                + " | cMax: " + colMax
-                + " | rMin: " + rowMin
-                + " | rMax: " + rowMax);
-
-            for(int i = colMin; i < colMax; i++) {
-                ChangeGridItem(i, rowMin);
-                yield return this.creationWait;
+        while(!isComplete) {
+            isComplete = true;
+            if(rowMax > rowMin) {
+                for(int i = colMin; i < colMax; i++) {
+                    ChangeGridItem(data[i, rowMin]);
+                    yield return pauseTime;
+                }
+                rowMin++;
+                isComplete = false;
             }
-            rowMin++;
 
-            for(int i = rowMin; i < rowMax; i++) {
-                ChangeGridItem((colMax-1), i);
-                yield return this.creationWait;
+            if(colMax > colMin) {
+                col = colMax - 1;
+                for(int i = rowMin; i < rowMax; i++) {
+                    ChangeGridItem(data[col, i]);
+                    yield return pauseTime;
+                }
+                colMax--;
+                isComplete = false;
             }
-            colMax--;
 
-            for(int i = (colMax-1); i >= colMin; i--) {
-                ChangeGridItem(i, (rowMax-1));
-                yield return this.creationWait;
+            if(rowMax > rowMin) {
+                row = rowMax - 1;
+                for(int i = (colMax - 1); i > (colMin - 1); i--) {
+                    ChangeGridItem(data[i, row]);
+                    yield return pauseTime;
+                }
+                rowMax--;
+                isComplete = false;
             }
-            rowMax--;
 
-            for(int i = (rowMax - 1); i >= rowMin; i--) {
-                ChangeGridItem(colMin, i);
-                yield return this.creationWait;
+            if(colMax > colMin) {
+                for(int i = (rowMax - 1); i > (rowMin - 1); i--) {
+                    ChangeGridItem(data[colMin, i]);
+                    yield return pauseTime;
+                }
+                colMin++;
+                isComplete = false;
             }
-            colMin++;
         }
     }
 
-    private void ChangeGridItem(int col, int row) {
-        GridArrayData data = this.grid2DArray[col, row];
+    private void ChangeGridItem(GridArrayData data) {
         data.GridImage.color = (data.GridImage.color == Color.red) ? Color.white : Color.red;
         data.GridText.color = (data.GridText.color == Color.black) ? Color.white : Color.black;
     }
@@ -129,20 +138,18 @@ public class GridManager : MonoBehaviour {
     }
 
     private void SubscribeToUI() {
-        UIController ui = FindObjectOfType<UIController>();
         UnsubscribeToUI();
-        ui.OnClickGenerate += StartCreateGrid;
-        ui.OnClickSnake += StartSnakeGrid;
-        ui.OnGridWidthChange += UpdateWidth;
-        ui.OnGridHeightChange += UpdateHeight;
+        UIController.Instance.OnClickGenerate += StartCreateGrid;
+        UIController.Instance.OnClickSnake += StartSnakeGrid;
+        UIController.Instance.OnGridWidthChange += UpdateWidth;
+        UIController.Instance.OnGridHeightChange += UpdateHeight;
     }
 
     private void UnsubscribeToUI() {
-        UIController ui = FindObjectOfType<UIController>();
-        ui.OnClickGenerate -= StartCreateGrid;
-        ui.OnClickSnake -= StartSnakeGrid;
-        ui.OnGridWidthChange -= UpdateWidth;
-        ui.OnGridHeightChange -= UpdateHeight;
+        UIController.Instance.OnClickGenerate -= StartCreateGrid;
+        UIController.Instance.OnClickSnake -= StartSnakeGrid;
+        UIController.Instance.OnGridWidthChange -= UpdateWidth;
+        UIController.Instance.OnGridHeightChange -= UpdateHeight;
     }
     #endregion
 
